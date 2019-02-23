@@ -1,0 +1,65 @@
+---
+title: "Homework 6"
+author: "Ansel George"
+output: pdf_document
+---
+
+# 1
+
+We had shown in class that under the Sequentially Markovian Coalescent (SMC)
+for a sample of size 2, with recombination rate $\rho$, the density for the
+transition from a given coalescent time $T_{\ell-1}$ between the two lineages at
+locus $\ell-1$ to the coalescent time $T_\ell$ at the next locus is given by
+
+\begin{align}
+p_{\rho}(t_\ell|t_{\ell-1}) &:= \mathbb{P}_{\rho}\big\{ T_\ell \in dt_\ell | T_{\ell-1} = t_{\ell-1} \big\} \\
+  &= e^{-\rho t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + (1 - e^{\rho t_{\ell-1}}) \int_0^{\textrm{min}(t_\ell, t_{\ell-1})} \frac{\rho e^{-\rho t_b}}{1 - e^{-\rho t_{\ell-1}}} e^{-(t_\ell - t_b)} dt_b
+\end{align}
+
+Show that for $\rho \neq 1$, this is equal to
+
+\begin{align}
+  e^{-\rho t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + \frac{\rho}{1-\rho} e^{-t_\ell} \big( e^{(1-\rho)\textrm{min}(t_\ell, t_{\ell-1})} - 1 \big)
+\end{align}
+
+What if this is equal to if $\rho = 1$?
+
+
+# 2
+
+In the coalescent with recombination for a sample of size 2 for 2 loci with
+recombination rate $\rho$, we denoted by $T_1$ the coalescence time of the two
+ancestral lineages at the first locus and by $T_2$ the coalescence time at the
+second locus. We had shown that the covariance is given by
+
+\begin{align}
+\mathbb{C}^{\textrm{reco}}(T_1,T_2) = \frac{\rho + 18}{\rho^2 + 13\rho + 18}
+\end{align}
+
+Similarly, in the Sequentially Markovian Coalescent, the covariance between T_1
+and T_2 is given by 
+
+\begin{align}
+\mathbb{C}^{\textrm{SMC}}(T_1,T_2) = \frac{1}{1+\rho}
+\end{align}
+
+
+## a)
+
+Write an R function to plot both of these functions for $\rho$ between $0$ and
+$20$. Plot them in the sample plot using different colors.
+
+
+## b)
+
+For both functions, what are the values for $\rho = 1$, and what are the values
+for $\rho \rightarrow \infty$? Provide a mathematical argument. A visual
+argument from the plot is not sufficient.
+
+
+# 3
+
+
+# 4
+
+
