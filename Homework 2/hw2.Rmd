@@ -1,0 +1,289 @@
+---
+title: "Problem Set 2"
+author: "Ansel George"
+output: pdf_document
+---
+
+```{r}
+library(ggplot2)
+library(reshape2)
+
+set.seed(123)
+```
+
+# 1. 
+
+**Using R, write a program to graph the male and female allele frequencies over
+several generations for a population that is started with all $A_1 A_1$ females
+($p_f = 1$) and $A_2 A_2$ males ($p_m = 0$). Show program and output.**
+
+```{r}
+nGenerations <- 10
+p_f <- 1
+p_m <- 0
+popSize <- 100 # 2*popSize for both male and female
+maleGeno <- rbinom(popSize, 2, p_m)
+femaleGeno <- rbinom(popSize, 2, p_f)
+
+# assuming equal sex ratio
+pMale <- rep(0, nGenerations+1)
+pFemale <- rep(0, nGenerations+1)
+pMale[1] <- p_m
+pFemale[1] <- p_f
+
+for (gen in 1:nGenerations) {
+  newMaleGeno <- rbinom(popSize, 1, pMale[gen]) + rbinom(popSize, 1, pFemale[gen])
+  newFemaleGeno <- rbinom(popSize, 1, pMale[gen]) + rbinom(popSize, 1, pFemale[gen])
+  pMale[gen+1] <- mean(newMaleGeno)/2
+  pFemale[gen+1] <- mean(newFemaleGeno)/2
+  maleGeno <- newMaleGeno
+  femaleGeno <- newFemaleGeno
+}
+
+pMale
+pFemale
+```
+
+```{r}
+df <- data.frame("Generation"=1:nGenerations, "Male"=pMale[1:length(pMale)-1],
+                "Female"=pFemale[1:length(pFemale)-1])
+meltydf <- melt(df, id="Generation")
+ggplot(meltydf, aes(x=Generation, y=value, color=variable)) + geom_line()
+```
+
+The population hits HW frequencies for both sexes at the first generation. The
+allele frequencies in each sex drift afterward.
+
+Had the alleles instead been X-linked, the dynamics would have been as follows:
+
+```{r}
+nGenerations <- 10
+pF <- 1     # starting female allele frequency
+pM <- 0     # starting male allele frequency
+nM <- 10000 # number of males
+nF <- 10000 # number of females
+
+females <- rbinom(nF, 2, pF)
+males <- rbinom(nM, 1, pM) # Males only have 1 X, so sample once
+
+# Create arrays to track allele frequencies over time
+ptracker <- 0*1:(nGenerations+1)
+ptracker[1] <- (2*pF*nF+pM*nM)/(2*nF+nM) # X-linked allele frequencies are 2 parts female, 1 part male
+pMtracker <- 0*1:(nGenerations+1)
+pMtracker[1] <- pF
+pFtracker <- 0*1:(nGenerations+1)
+pFtracker[1] <- pM
+
+for (i in 1:nGenerations) {
+  newmales <- rbinom(nM, 1, pF)
+  newfemales <- rbinom(nF, 1, pF) + rbinom(nF, 1, pM)
+  newpF <- mean(newfemales)/2
+  newpM <- mean(newmales)
+
+  males <- newmales
+  females <- newfemales
+  pF <- newpF
+  pM <- newpM
+
+  ptracker[i+1] <- (pF*nF+.5*pM*nM)/(nF+.5*nM)
+  pFtracker[i+1] <- pF
+  pMtracker[i+1] <- pM
+}
+
+ptracker # overall allele frequency
+pFtracker # female allele frequency
+pMtracker # male allele frequency
+```
+
+In the starting population, the allele is fixed in females and absent in males.
+The overall frequency is $\frac{2}{3}$ (2 parts from females and 1 part from
+males). The different inheritance patterns for males and females prevent HWE
+from being reached in the first generation, and the sex genotype frequencies
+slowly change until both converge to $\frac{2}{3}$, barring drift introduced by
+random sampling from generation to generation.
+
+```{r}
+df <- data.frame("Generation"=0:nGenerations, "Male"=pMtracker,
+                "Female"=pFtracker, "Allele"=ptracker)
+meltydf <- melt(df, id="Generation")
+ggplot(meltydf, aes(x=Generation, y=value, color=variable)) + geom_line()
+```
+
+# 2. 
+
+**Mutation-selection balance: When mutations are deleterious, whether recessive
+or partially so (dominant deleterious mutations are eliminated very rapidly
+from a population and are not a major source of segregating mutations in a
+population), an equilibrium will be established that balances the input of new
+mutant alleles and their elimination from the population by their selective
+disadvantage, 1-s. Under a model with mutational input at rate u from allele A
+to A\* per generation, allele frequency of A in the next generation will be:**
+
+\begin{align}
+p^\prime &= \frac{p(1-qhs)}{\overline{w}}(1-\mu)
+\end{align}
+
+**where**
+
+\begin{align}
+\overline{w} &= 1 - sq(q + 2ph)
+\end{align}
+
+**and $h$ is the degree of dominance (here $h=0$ is completely recessive and $h=1$ is
+complete dominance).**
+
+## a.
+**What is the equation describing the equilibrium frequency $\overline{q} = 1 -
+\overline{p}$ of the mutant allele?**
+
+At equilibrium, $p^\prime = p$, so:
+
+\begin{align}
+  p^\prime &= \frac{p(1-qhs)}{\overline{w}}(1-\mu) \\
+  1 &= \frac{(1-qhs)}{\overline{w}}(1-\mu) \\
+  \implies \overline{w} &= 1 - q h s + \mu q h s - \mu
+\end{align}
+
+From the expresion for the mean population fitness:
+
+\begin{align}
+  1 - sq(q + 2ph) &= \overline{w} =  1 - q h s + \mu q h s - \mu \\
+  1 - sq(q + 2(1-q)h) &=  1 - q h s + \mu q h s - \mu \\
+  1 - sq(q + 2h - 2qh) &=  1 - q h s + \mu q h s - \mu \\
+  1 - sq^2 - 2sqh + 2sq^2h &=  1 - qhs + \mu qhs - \mu \\
+  sq^2 - sqh + 2sq^2h &=  \mu qhs - \mu \\
+  q^2 (2sh-s) +  q (\mu hs - hs)  + \mu  &= 0 \\
+  q^2 + q \frac{\mu hs -hs}{s(2h-1)} + \frac{\mu}{s(2h-1)} &= 0 \\
+  \big(q + \frac{h(\mu - 1)}{2(2h-1)}\big)^2 = \frac{h^2 (\mu-1)^2}{4(2h-1)^2} -  \frac{\mu}{s(2h-1)}
+\end{align}
+\begin{align}
+  \implies q &= \Big( \frac{h^2 (\mu-1)^2}{4(2h-1)^2} -  \frac{\mu}{s(2h-1)} \Big)^\frac{1}{2} - \frac{h(\mu - 1)}{2(2h-1)}\big)
+\end{align}
+
+## b. 
+**What is the equilibrium frequency as a function of $u$ and $s$ when the
+mutant is completely recessive ($h=0$) or semidominant ($h=0.5$)?**
+
+When $h=0$, the equation for $q$ simplifies to:
+
+\begin{align}
+  q &= \Big(\frac{\mu}{s}\Big)^{\frac{1}{2}}
+\end{align}
+
+For $h=.5$, extra simplifications are necessary because of the poles introduced
+by the $2h-1$ in the denominator. Because the mutation is deleterious, it can
+be assumed its relative frequency will be small, so in the derivation for $q$,
+one could make the simplification that $q^2 \ll 1$ and is therefore negligible
+in the calculation.
+
+\begin{align}
+  0 = q^2 (2sh-s) + q(\mu hs - hs) + \mu &\approx q(\mu hs -hs) + \mu
+\end{align}
+
+\begin{align}
+  \implies q &= \frac{\mu}{sh(1-\mu)} \\
+  &\approx \frac{\mu}{sh}
+\end{align}
+
+## c. 
+**In this formulation of mutation-selection balance, we ignore back-mutation
+from $A\*$ to $A$. Why is this reasonable to do?**
+
+The mutant will be at low frequency, so the number of reverted mutants - the
+product of the mutant frequency and mutation rate - will be negligibly small
+and can be safely omitted from the calculation.
+
+## d.
+**The rate of mutation to recessive lethals is $2.0 * 10^{-6}$ per gene per
+generation. The equilibrium frequency of lethal alleles in the population is
+$2.0 * 10^{-4}$. Are these measurements consistent with complete recessivity?
+If not, compute h?**
+
+If recessive ($h=0$),
+
+\begin{align}
+  q &= \Big(\frac{\mu}{s}\Big)^{\frac{1}{2}} \\
+  2.0*10^{-4} &\neq \Big(\frac{2.0*10^{-6}}{1}\Big)^{\frac{1}{2}} = 1.414*10^{-3}
+\end{align}
+
+The measurement is not consistent with complete recessivity.
+
+The corresponding value of h is:
+\begin{align}
+  q &= \frac{\mu}{sh} \\
+  2.0*10^{-4} &= \frac{2.0*10^{-6}}{1h} \\
+  \implies h &= 1.0*10^{-2}
+\end{align}
+
+The value is still small, so the mutant is *almost* completely recessive.
+
+
+# 3. 
+
+**Sickle-cell anemia is caused by a mutant hemoglobin that in homozygotes is
+historically lethal. Heterozygotes, however, are protected from Malaria, while
+wildtype homozygotes are susceptible to Malaria. The frequency of sickle-cell
+anemia in one region of Africa is 1/144. Malaria has now been eradicated from
+this region. What will be the incidence of this anemia 2 generations from now?
+20 generations from now? (Assume that the heterozygote has no loss in fitness.)
+What lesson can be learned from this about eugenics programs intending to
+eliminate deleterious mutations from the population?**
+
+$w_{11} = w_{12} = 1$, and $w_{22} = 0$. Also, $s=1$ for lethal recessives, and
+$h=0$ for no altered heterozygote viability.
+
+Assuming random mating, the probability distribution for $p$ and $q$ for the
+next generation is:
+
+\begin{align}
+p^\prime &= \frac{p\omega_{1}}{\overline{\omega}} \\
+p^\prime &= \frac{p( p\omega_{11} + q\omega_{12})} {p^2 \omega_{11} + 2pq\omega_{12} + q^2\omega_{22}} \\
+p^\prime &= \frac{p( p + q(1-sh))} {p^2 + 2pq(1-sh) + q^2 (1-s)} \\
+p^\prime &= \frac{p(1-qsh))} {1 - 2pq(sh) + sq^2} \\
+p^\prime &= \frac{p(1-qhs)}{1-sq(q+2ph)} \\
+&= \frac{p}{1-q^2} \textrm{, given } h=0 \textrm{ and } s=1 \\
+&= \frac{1-q}{1-q^2} \\
+&= \frac{1}{1+q} \\
+p^\prime = 1 - q^\prime &= \frac{1}{1+q} \\
+\implies q^\prime &= \frac{q}{1+q}
+\end{align}
+
+$q = \frac{1}{12}$, so after 2 generations 
+$q^{(2)} = \frac{q}{1+2q} = 0.07142857$, and after 20
+generations, $q^{(20)} = \frac{q}{1+20q} = 0.03125$.
+
+This result shows that strongly deleterious recessive mutations will be
+eliminated over time. Due to the low frequency of the allele, homozygous
+mutants arise infrequently, but whatever homozygous that arise will be
+eliminated, lowering the overall allele frequency.
+
+The utility of intervening to remove deleterious variants is questionable. Even
+if selection was not strong $s < 1$, the dynamics would be:
+\begin{align}
+q^\prime &= \frac{q-sq^2}{1-sq^2}
+\end{align}
+
+With the assumption of random mating and no drift, $q^\prime$ will always be
+decreasing if there is any fitness loss because $q\leq 1$.
+
+This suggests persistent deleterious mutants could arise due to some sort of
+conditional benefit - in this case to heterozygote viability with respect to
+malarial resistance - or high mutation rate, which together make these kind of
+eugenic projects unnecessary or futile.
+
+
+# 4. 
+
+**A 10-kb-long DNA sequence is obtained from a single individual. The mutation
+rate in the region is $1.6*10^{-9}$ per site per generation. 21 sites have two
+alleles. Assuming a Wright-Fisher infinite sites model, provide an estimate of
+the effective population size of the population from which this individual has
+been sampled.**
+
+Given the statistic for nucleotide diversity:
+
+\begin{align}
+\pi &= 4N\mu \\
+\frac{21}{10000} &= 4N_e 1.6*10^{-9} \\
+\implies N_e &= 328125
+\end{align}
