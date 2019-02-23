@@ -1,0 +1,296 @@
+---
+title: "Problem Set 4"
+author: "Ansel George"
+output: pdf_document
+---
+
+```{r}
+library(dplyr)
+set.seed(10)
+```
+
+
+# 1
+
+Consider the two datasets
+
+\begin{equation*}
+S^{(1)} = \left(
+  \begin{array}{cccccc}
+    1 & 1 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & 1 & 1 & 0 \\
+    1 & 0 & 0 & 0 & 0 & 1 \\
+  \end{array}
+  \right)
+\end{equation*}
+
+and
+
+\begin{equation*}
+S^{(2)} = \left(
+  \begin{array}{ccc}
+    1 & 1 & 0 \\
+    0 & 0 & 1 \\
+    1 & 0 & 0 \\
+    1 & 0 & 0 \\
+  \end{array}
+  \right)
+\end{equation*}
+
+under the Infinitely-Many-Sites model. Compute the estimates
+$\hat{\theta}_{FL}$, $\hat{\theta}_{W}$ , and $\hat{\theta}_{\pi}$ for these
+datasets. (As defined in class. Note that the sum for $\hat{\theta}_{\pi}$ is
+over all ordered pairs $[i < j]$)
+
+```{r}
+computeTajima <- function(S) {
+  pairwisedifferences <- 0
+  n <- nrow(S)
+  for (i in 1:(n-1)) {
+    for (j in (i+1):n) {
+      pairwisedifferences <- pairwisedifferences + sum(!(S[i,] == S[j,]))
+    }
+  }
+  return(2/n/(n-1) * pairwisedifferences)
+}
+
+computeWatterson <- function(S) {
+  nsites <- ncol(S)
+  n <- nrow(S)-1
+  hsum <- 0
+  for (i in 1:n) {
+    hsum <- hsum + 1/i
+  }
+  return(nsites/hsum)
+}
+
+computeFuLi <- function(S) {
+  return(sum(colSums(S) == 1))
+}
+```
+
+```{r}
+S1 = matrix(c(1,0,1,1,0,0,0,1,0,1,1,0,0,1,0,0,0,1),nrow=3)
+S2 = matrix(c(1,0,1,1,1,0,0,0,0,1,0,0),nrow=4)
+```
+
+## $S^{(1)}$
+
+The site frequency spectrum is $(4, 2)$.
+
+**Tajima's estimator $\theta_{\pi}$:**
+
+$\hat{\theta}_{\pi} = \frac{2}{n(n-1)} \sum_{i,j=1;i < j}^{n} \Delta_{i,j} = \frac{2}{3 * 2} \big(4 + 3 + 5\big) = 4$
+
+```{r}
+computeTajima(S1)
+```
+
+**Watterson's estimator $\theta_W$:**
+
+$\hat{\theta}_{W} = \frac{\S_n}{\sum_{i=1}^{n-1} \frac{1}{i}} = \frac{6}{\frac{1}{1} + \frac{1}{2}} = 4$
+
+
+```{r}
+computeWatterson(S1)
+```
+
+**Fu-Li estimator $\theta_W$:**
+
+$\hat{\theta}_{FL} = \eta_1 = 4$
+
+```{r}
+computeFuLi(S1)
+```
+
+## $S^{(2)}$
+
+The site frequency spectrum = $(2, 0, 1)$.
+
+**Tajima's estimator $\theta_{\pi}$:**
+
+$\hat{\theta}_{\pi} = \frac{2}{n(n-1)} \sum_{i,j=1;i < j}^{n} \Delta_{i,j} = \frac{2}{4 * 3} \big(3 + 1 +1 + 2 + 2 + 0\big) = 1.5$
+
+```{r}
+computeTajima(S2)
+```
+
+**Watterson's estimator $\theta_W$:**
+
+$\hat{\theta}_{W} = \frac{\S_n}{\sum_{i=1}^{n-1} \frac{1}{i}} = \frac{3}{\frac{1}{1} + \frac{1}{2} + \frac{1}{3}} = 1.636364$
+
+```{r}
+computeWatterson(S2)
+```
+
+**Fu-Li estimator $\theta_W$:**
+
+$\hat{\theta}_{FL} = \eta_1 = 2$
+
+```{r}
+computeFuLi(S2)
+```
+
+
+# 2
+In class, we derived that, in a sample of size $n$, the expected number of
+segregating sites $\eta_i$ where $i$ individuals have the derived is given by
+
+\begin{equation*}
+  \mathbb{E}\big[\eta_i\big] = \sum_{k=2}^n p_{k,i} k \mathbb{E}[T_k]
+\end{equation*}
+
+with
+
+\begin{equation*}
+  p_{k,i} = \frac{ {{n-i-1} \choose {k-2}} } { { {n-1} \choose {k-1} } }
+\end{equation*}
+
+Show that under the standard neutral coalescent with constant population size
+
+\begin{equation*}
+  \mathbb{E}[\eta_i] = \frac{\theta}{i}
+\end{equation*}
+
+holds (including the missing steps that we omitted in class). (Hint: You can
+(and should) use the combinatorial identity
+
+\begin{equation*}
+  \sum_{k=2}^n { {n-k} \choose {i-1} } = { {n-1} \choose i }
+\end{equation*}
+
+for the binomial coefficient.)
+
+
+\begin{align*}
+  \mathbb{E}\big[\eta_i\big] &= \sum_{k=2}^n p_{k,i} k \mathbb{E}[T_k] \\
+  &= \sum_{k=2}^n \frac{ { {n-i-1} \choose {k-2} } }{ { {n-1} \choose {k-1}} } \frac{\theta}{2} \frac{k}{ {k \choose 2} } \\
+  &= \sum_{k=2}^n \frac{ { {n-i-1} \choose {k-2} } }{ { {n-1} \choose {k-1}} } \frac{\theta}{2} \frac{2k}{k(k-1)} \\
+  &= \sum_{k=2}^n \frac{ { {n-i-1} \choose {k-2} } }{ { {n-1} \choose {k-1}} } \frac{\theta}{2} \frac{2}{k-1} \\
+  &= \sum_{k=2}^n \frac{ \frac{(n-i-1)!}{(n-i-k+1)!(k-2)!} }{ \frac{(n-1)!}{(n-k)!(k-1)!} } \frac{\theta}{k-1} \\
+  &= \sum_{k=2}^n \frac{ (n-i-1)!(n-k)!(k-1)! } { (n-i-k+1)!(n-1)!(k-2)! } \frac{\theta}{k-1} \\
+  &= \theta \sum_{k=2}^n \frac{ (n-i-1)!(n-k)!} { (n-i-k+1)!(n-1)! } \\
+  &= \theta \frac{ (n-i-1)! }{(n-1)!} \sum_{k=2}^n \frac{(n-k)!} {(n-i-k+1)!} \\
+  &= \theta \frac{ (n-i-1)!(i-1)!}{(n-1)!} \sum_{k=2}^n \frac{(n-k)!} {(n-i-k+1)!(i-1)!} \\
+  &= \theta \frac{ (n-i-1)!(i-1)!}{(n-1)!} \sum_{k=2}^n { {n - k} \choose {i-1} } \\
+  &= \theta \frac{ (n-i-1)!(i-1)!}{(n-1)!} { {n - 1} \choose {i} } \\
+  &= \theta \frac{ (n-i-1)!(i-1)!}{(n-1)!} \frac{(n - 1)!}{i!(n-i-1)!} \\
+  &= \frac{\theta}{i}
+\end{align*}
+
+
+# 3
+In class we had discussed the Ewens’ sampling formula, which can be used to
+compute the probability of observing a given sample configuration at a single
+locus under the Infinitely-Many-Alleles (IMA) model with mutation rate
+$\theta$. A sample configuration for a sample of size $n$ was denoted by
+$\underline{a} = (a_1, \dots, a_n)$, where $a_j$ denotes the number of alleles
+that are observed in $j$ individuals. The probability of observing the
+configuration $a$ is then given by
+
+\begin{equation*}
+\mathbb{P}_{n,\theta}\{\underline{a}\} = \frac{n!}{\theta_{n\uparrow}} \prod_{j=1}^n \Big(\frac{\theta}{j}\Big)^{a_j} \frac{1}{a_{j}!}
+\end{equation*}
+
+where the rising factorial is defined as
+
+\begin{equation*}
+\theta_{n\uparrow} := \theta(\theta+1)(\theta+2)\dots(\theta+n-1)
+\end{equation*}
+
+## a)
+Compute $\mathbb{P}^{(n)}_{\theta} \big\{ (2,1,0,0) \big\}$ for $\theta=2$ and
+$\theta=1$, with $n=4$.
+
+For $\theta=2$, $n=4$, and $\underline{a} = \left[ \begin{array}{cccc} 2 & 1 &
+0 & 0 \end{array} \right]$:
+
+\begin{align*}
+  \mathbb{P}(\underline{a}) &= \frac{4!}{2*3*4*5} \prod_{j=1}^n \Big( \frac{2}{j} \Big)^{a_j} \frac{1}{{a_j}!} \\
+  &= \frac{1}{5} \Big( \big(\frac{2}{1})^2 \frac{1}{2!}  \Big) \Big( \big(\frac{2}{2})^1 \frac{1}{1!}  \Big) \Big( \big(\frac{2}{3})^0 \frac{1}{0!}  \Big) \Big( \big(\frac{2}{4})^0 \frac{1}{0!}  \Big) \\
+  &= \frac{1}{5} 2 = \frac{2}{5}
+\end{align*}
+
+For $\theta=1$, $n=4$, and $\underline{a} = \left[ \begin{array}{cccc} 2 & 1 &
+0 & 0 \end{array} \right]$:
+
+\begin{align*}
+  \mathbb{P}(\underline{a}) &= \frac{4!}{1*2*3*4} \prod_{j=1}^n \Big( \frac{1}{j} \Big)^{a_j} \frac{1}{{a_j}!} \\
+  &= \Big( \big(\frac{1}{1})^2 \frac{1}{2!}  \Big) \Big( \big(\frac{1}{2})^1 \frac{1}{1!} \Big) \Big( \big(\frac{1}{3})^0 \frac{1}{0!}  \Big) \Big( \big(\frac{1}{4})^0 \frac{1}{0!}  \Big) \\
+  &= \frac{1}{2} \frac{1}{2} = \frac{1}{4}
+\end{align*}
+
+
+## b) 
+Which of the two mutation rates $\theta = 2$ or $\theta = 1$ is more likely to
+be the true mutation rate underlying the data?
+
+The likelihood under the model for $\theta=2$ is greater than that of
+$\theta=1$, so $1$ is more likely to be the true mutation rate given the data.
+
+
+# 4
+
+Download the additional file “exampleSFS.txt” provided for the assignment on
+Canvas. This file contains the empirical Site-Frequency-Spectrum for a sample
+of size $n = 170$ in a chromosomal segment of length 30 Mbp. It contains 169
+numbers, the first number is the entry $\eta_1$, the second $\eta_2$, up to the
+last number $\eta_{169}$. Write a program in R that loads this file, and
+computes estimates for the mutation rate using $\hat{\theta}_{FL}$,
+$\hat{\theta}_{W}$ , and $\hat{\theta}_n$. Provide these estimates as mutation
+rates per nucleotide site.
+
+
+```{r}
+computeTajimaSFS <- function(sfs) {
+  pairwisedifferences <- 0
+  nsamples <- length(sfs)+1
+  for (i in 1:(length(sfs))) {
+    pairwisedifferences <- pairwisedifferences + (nsamples-i)*i*sfs[i]
+  }
+  return(2/nsamples/(nsamples-1) * pairwisedifferences)
+}
+
+computeWattersonSFS <- function(sfs) {
+  nmutations <- sum(sfs)
+  nsamples <- length(sfs)
+  hsum <- 0
+  for (i in 1:nsamples) {
+    hsum <- hsum + 1/i
+  }
+  return(nmutations/hsum)
+}
+
+computeFuLiSFS <- function(sfs) {
+  return(sfs[1])
+}
+```
+
+```{r}
+sfs <- matrix(as.numeric(read.csv("exampleSFS.txt", sep='\t', header=F)), nrow=1)
+
+computeTajimaSFS(sfs)
+computeWattersonSFS(sfs)
+computeFuLiSFS(sfs)
+```
+
+The estimators produce similar results, suggesting that the data closely fits
+the neutral coalescent model.
+
+Also, one could if interested estimate $\hat{\theta}$ from the expectation for
+the site frequency spectrum is $14801.77$.
+
+```{r}
+i <- seq(1, length(sfs))
+m <- lm(log(as.numeric(sfs)) ~ log(i))
+
+# plot of model and data
+plot(log(i), log(as.numeric(sfs)))
+abline(m$coefficients[1], m$coefficients[2])
+
+# q-q plot of model and data
+qqplot(log(sfs), m$coefficients[1] + log(i) * m$coefficients[2])
+abline(0,1)
+
+exp(m$coefficients[1])
+```
