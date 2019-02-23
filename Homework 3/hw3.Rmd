@@ -1,0 +1,133 @@
+---
+title: "Problem Set 3"
+author: "Ansel George"
+output: pdf_document
+---
+
+# 1.
+
+**Assume a mutation rate of $\frac{\theta}{2}$ and denote by $M_t$ the number
+of mutations on a branch of length $t \in \mathbb{R}_{+}$. We had shown in
+class that this number is Poisson-distributed with parameter
+$\frac{\theta}{2}t$, thus,**
+
+\begin{equation}
+P\{M_t = m\} = \frac{1}{m!}\Big(\frac{\theta}{2}t\Big)^m e^{\frac{\theta}{2}t}
+\end{equation}
+
+**holds. Now consider the sum of the number of mutations $M_t$ and $M_s$ on two
+branches of length $t \in \mathbb{R}_{+}$ and $s \in \mathbb{R}_{+}$,
+respectively. Compute**
+
+\begin{equation}
+P\{M_t + M_s = l\} \textrm{.}
+\end{equation}
+
+\begin{align}
+P\{M_t + M_s = l\} &= \sum_{m=0}^l \Big( \frac{1}{m!} \big( \frac{\theta t}{2} \big)^{m} \mathrm{e}^{-\frac{\theta t}{2}} \Big) \Big( \frac{1}{(l-m)!} \big( \frac{\theta s}{2} \big)^{l-m} \mathrm{e}^{-\frac{\theta s}{2}} \Big) \\
+  &= \sum_{m=0}^l \Big( \frac{1}{(l-m)!m!} \big( \frac{\theta (t+s)}{2} \big)^{l} \mathrm{e}^{-\frac{\theta (t+s)}{2}} \Big) \\
+  &= \frac{1}{l!} \mathrm{e}^{\frac{-\theta (t+s)}{2} }  \sum_{m=0}^l \frac{l!}{(l-m)!m!} \big( \frac{\theta t}{2} \big)^{m} \big( \frac{\theta s}{2} \big)^{l-m}  \\
+  &= \frac{1}{l!} \mathrm{e}^{\frac{-\theta (t+s)}{2}} \big( \frac{\theta t}{2} + \frac{\theta s}{2} \big)^{l} \\
+  &= \frac{1}{l!} \mathrm{e}^{\frac{-\theta (t+s)}{2}} \big( \frac{\theta (t+s)}{2} \big)^{l} \\
+  &\sim Poisson\Big(\frac{\theta (t+s)}{2}\Big)
+\end{align}
+
+In general, the sum of two Poisson-distributed variables follows a Poisson
+distribution, too, where the parameter is the sum of the component paramters.
+Here, $M_t + M_s \sim Poi\big(\frac{\theta t}{2} + \frac{\theta s}{2}\big) =
+Poi\big(\frac{\theta (t+s)}{2}\big)$.
+
+
+# 2.
+**Consider the haploid Wright-Fisher model with constant population size
+$2N$.**
+
+## a)
+**When taking a sample of 3 individuals, what is the probability that they all
+have a common parent in the previous generation, and why?**
+
+$1 * \frac{1}{2N} * \frac{1}{2N} = \frac{1}{4N^2}$
+
+One individual can pick any parent, and the other two must pick the same one.
+There are $2N$ individuals, so the probability of both picking the same as the
+first is $\frac{1}{4N^2}$.
+
+
+## b)
+**When taking a sample of 2 individuals, what is the probability that they have
+a common parent in the previous generation, and why?**
+
+$1 * \frac{1}{2N} = \frac{1}{2N}$
+
+One individual can pick any parent, and the other must pick the same one.
+There are $2N$ individuals, so the probability of the other picking the same as
+the first is $\frac{1}{2N}$.
+
+
+## c)
+**Comparing a) and b): Why is it justified to neglect triple merger in large
+populations and focus on binary mergers only?**
+
+When N is large, $\frac{1}{2N} \gg \frac{1}{4N^2}$. This mean the probability
+of a three-way merger is very low when compared to a 2-way merger.
+
+
+# 3.
+**Consider the coalescent process for a sample of size $n \in N$. Show that the
+variance of the total branch length of the coalescent tree $L^n$ is given by**
+
+\begin{equation}
+V[L^n] = \sum^{n-1}_{k=1} \frac{4}{k^2}
+\end{equation}
+
+From the definition of branch length,
+
+\begin{align}
+L^n &= \sum_{i=2}^{n} k T_k
+\end{align}
+
+where $T_k$ is the distribution of coalescence time for $k$ lineages. Note that
+each branch is independent of the others.
+
+\begin{align}
+Var[L^n] &= Var\Big( \sum_{i=2}^{n} k T_k \Big) \\
+  &= \sum_{i=2}^{n} Var(k T_k) \\
+  &= \sum_{i=2}^{n} k^2 Var(T_k) \\
+  &= \sum_{i=2}^{n} k^2 \big( \frac{1}{{k \choose 2}} \big)^2 \\
+  &= \sum_{i=2}^{n} k^2 \big( \frac{2}{k(k-1)} \big)^2 \\
+  &= \sum_{i=2}^{n} \frac{4}{(k-1)^2} \\
+  &= \sum_{i=1}^{n-1} \frac{4}{k^2} \\
+\end{align}
+
+
+# 4.
+**Consider the standard coalescent for a sample of size $n \in N$, with
+mutation rate $\frac{\theta}{2}$ Let $M$ be the random number of mutations that
+occur before coalescence between any of the $n$ lineages. Compute $P\{M =
+m\}$.**
+
+The time for the first coalescence follow $exp({n \choose 2})$, where $n$ is
+the number of lineages, and the branch lengths before then follows $n * exp({n
+\choose 2})$.
+
+Because the number of mutations is Poisson-distributed ($Poi(\frac{\theta
+t}{2})$) for a given branch, the number of mutations on the $n$ branches
+present before the first coalescence follows $Poi(n \frac{\theta t}{2})$.
+
+To find the probability of $P(M=m)$, integrate the joint probability of
+mutation time and time to first coalescence over all coalescent time.
+
+\begin{align}
+P(M = m) &= \int_0^\infty Poi\big(n \frac{\theta t}{2}\big) Exp\big({n \choose 2}t\big) \mathrm{d}t \\
+  &= \int_0^\infty \Big( \frac{\theta n t}{2} \Big)^m \mathrm{e}^{-\frac{\theta n t}{2}} \frac{1}{m!} {n \choose 2} \mathrm{e}^{-{n \choose 2}t} \mathrm{d}t \\
+  &= \frac{1}{m!} {n \choose 2} \Big( \frac{\theta n}{2} \Big)^m \int_0^\infty t^m \mathrm{e}^{-\big( \frac{\theta n + n(n-1)}{2} t\big)} \mathrm{d}t \\
+  &= \dots \textrm{m iterations of integration by parts} \dots \\
+  &= \frac{1}{m!} {n \choose 2} \Big( \frac{\theta n}{2} \Big)^m  m! \Big(\frac{2}{n\theta + n(n-1)} \Big)^{m+1} \\
+  &= \frac{1}{m!} {n \choose 2} \Big( \frac{\theta n}{2} \Big)^m  m! \Big(\frac{2}{n\theta + n(n-1)} \Big)^{m+1} \\
+  &= \Big( \frac{n-1}{\theta + n - 1} \Big)  \Big(\frac{\theta}{\theta + n - 1} \Big)^{m}
+\end{align}
+
+
+Lo and behold, $P(M=m)$ follows a geometric distribution where
+$\frac{n-1}{\theta +n-1}$ is the probability of first coalescence and
+$\frac{\theta}{\theta + n - 1}$ the probability of mutation.
