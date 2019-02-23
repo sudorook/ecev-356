@@ -1,0 +1,416 @@
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass{essay}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools}
+\usepackage{minted}
+
+\begin{document}
+\sffamily
+
+\setsmallheader{Problem Set 1}{ECEV 35600}{Ansel George}
+\setbodyheader{Ansel George}{Problem Set 1}
+
+\begin{essaystyle}
+
+\textbf{1.} The observed counts of genotypes of humans at the MN blood group
+locus in two samples are:
+
+\begin{tabular}{l | r r r}
+Genotype             & MM  & NM & NN \\ \hline
+New Guinea Highlands & 2   & 32 & 269  \\
+Guatemalan Indians   & 112 & 74 & 17\\
+\end{tabular}
+
+\textbf{(a)} Estimate the allele frequencies in each population.
+
+New Guinea Highlands:
+
+\begin{align}
+N_{NG} &= 2 + 32 + 269 = 303
+\end{align}
+\begin{align}
+  P_{M,NG} &= \frac{N_{MM,NG}}{N_{NG}} + \frac{1}{2}\frac{N_{MN,NG}}{N_{NG}} \\
+  &= \frac{2}{303} + \frac{1}{2}\frac{32}{303} = 0.05940594
+\end{align}
+\begin{align}
+  P_{N,NG} &= \frac{N_{NN,NG}}{N_{NG}} + \frac{1}{2}\frac{N_{MN,NG}}{N_{NG}} \\
+  &= \frac{269}{303} + \frac{1}{2}\frac{32}{303} = 0.9405941
+\end{align}
+
+Guatemalan Highlands:
+
+\begin{align}
+N_{NG} &= 112+74+17  = 203
+\end{align}
+\begin{align}
+  P_{M,G} &= \frac{N_{MM,G}}{N_{G}} + \frac{1}{2}\frac{N_{MN,G}}{N_{G}} \\
+  &= \frac{112}{203} + \frac{1}{2}\frac{74}{203} = 0.7339901
+\end{align}
+\begin{align}
+  P_{N,G} &= \frac{N_{NN,G}}{N_{G}} + \frac{1}{2}\frac{N_{MN,G}}{N_{NG}} \\
+  &= \frac{17}{203} + \frac{1}{2}\frac{74}{203} = 0.2660099
+\end{align}
+
+
+\textbf{(b)} Does each population appear to be in Hardy-Weinberg equilibrium?
+
+For populations to be in Hardy-Weinberg equilibrium, the genotype frequencies
+must match the products of the respective genotype frequencies, i.e. $P_{AA} =
+P_A^2$ and $P_{AB} = 2P_A P_B$.
+
+New Guinea Highlands:
+
+\begin{align}
+  E_{HW,NG}\big[P_{MM,NG}\big] &= P_{M,NG}^2 \\
+  &= 0.05940594^2 *303 = 1.069307\\
+  E_{HW,NG}\big[P_{MN,NG}\big] &= P_{M,NG}P_{N,NG}N_{NG} \\
+  &= 2* 0.05940594*0.9405941*303 = 33.8614\\
+  E_{HW,NG}\big[P_{NN,NG}\big] &= P_{N,NG}^2 \\
+  &= 0.9405941^2 *303 = 268.0693
+\end{align}
+
+Guatemalan Highlands:
+
+\begin{align}
+  E_{HW,G}\big[P_{MM,G}\big] &= P_{M,G}^2 \\
+  &= 0.7339901^2 *203 = 109.3645 \\
+  E_{HW,G}\big[P_{MN,G}\big] &= P_{M,G}P_{N,G}N_{G} \\
+  &= 2*0.7339901*0.2660099*203 = 79.27095 \\
+  E_{HW,G}\big[P_{NN,G}\big] &= P_{N,G}^2 \\
+  &= 0.2660099^2 *203 =21.44066
+\end{align}
+
+To assess whether the populations likely deviate from HW equilibrium, compute
+the $\chi^2$ statistic:
+
+New Guinea Highlands:
+
+\begin{align}
+  \chi^2 &= \frac{(2-1.069307)^2}{1.069307} + \frac{(32-33.8614)^2}{33.8614} + \frac{(269-268.0693)^2}{268.0693} \\
+  &= 0.9156021
+\end{align}
+
+Given 2 degrees of freedom and the low $\chi^2$ value, there is not much reason
+to believe the New Guinea Highlands population deviates substantially from HW
+equilibrium (p-value = 0.6327).
+
+Guatemalan Highlands:
+
+\begin{align}
+  \chi^2 &= \frac{(112-109.3645)^2}{109.3645} + \frac{(74-79.27095)^2}{79.27095} + \frac{(17-14.36453)^2}{14.36453} \\
+  &= 0.89752
+\end{align}
+
+Given 2 degrees of freedom and the low $\chi^2$ value, there is not much reason
+to believe the New Guinea Highlands population deviates substantially from HW
+equilibrium, either (p-value = 0.6384).
+
+
+\textbf{(c)} Suppose the two samples were combined, and analyzed. Would the
+combined sample appear to come from a population at Hardy-Weinberg equilibrium?
+(Calculate the observed and expected genotype frequencies (or counts)).
+
+The combined population has the following parameters:
+
+\begin{align}
+N_{Total} &= N_{NG} + N_G = 303 + 203 = 506
+\end{align}
+\begin{align}
+  P_{M,Total} &= \frac{N_{MM,NG} + N_{MM,G}}{N_{Total}} + \frac{1}{2}\frac{N_{MN,NG}+N_{NM,G}}{N_{Total}} \\
+  &= \frac{2+112}{506} + \frac{1}{2}\frac{32+74}{506} = 0.3300395
+\end{align}
+\begin{align}
+  P_{N,Total} &= \frac{N_{NN,NG} + N_{NN,G}}{N_{Total}} + \frac{1}{2}\frac{N_{MN,NG}+N_{NM,G}}{N_{Total}} \\
+  &= \frac{269+17}{506} + \frac{1}{2}\frac{32+74}{506} = 0.6699605
+\end{align}
+
+The HW expectations are:
+
+\begin{align}
+  E_{HW,Total}\big[P_{MM,Total}\big] &= P_{M,Total}^2 \\
+  &= 0.3300395^2 *506 = 55.11659 \\
+  E_{HW,Total}\big[P_{MN,Total}\big] &= P_{M,Total}P_{N,Total}N_{G} \\
+  &= 2*0.3300395*0.6699605*506 = 223.7668 \\
+  E_{HW,Total}\big[P_{NN,Total}\big] &= P_{N,Total}^2 \\
+  &= 0.6699605^2 *506 = 227.1166
+\end{align}
+
+The $\chi^2$ statistic for the combined population is:
+
+\begin{align}
+  \chi^2 &= \frac{(114-55.11659)^2}{55.11659} + \frac{(106-223.7668)^2}{223.7668} + \frac{(286 - 227.1166)^2}{227.1166} \\
+  &= 140.1539
+\end{align}
+
+When combined, the population appears to deviate substantially from HW
+equilibrium (p-value < 2.2e-16).
+
+
+\textbf{2.} A sample of Peromyscus polionotus were genotyped at the esterase-2
+locus using protein electrophoresis. Three alleles, denoted a, b and c were
+observed. The observed counts of the six genotypes were:
+
+\begin{tabular}{l | r r r r r r}
+Genotype & aa & bb & cc & ab & ac & bc \\
+Count    & 2  & 53 & 5  & 13 & 3  & 21 \\
+\end{tabular}
+
+\textbf{(a)} Estimate the allele frequencies of each of the alleles. Also, calculate the
+number of each genotype expected in the sample under Hardy-Weinberg
+equilibrium. 
+
+\begin{align}
+P_a &= \frac{2 + \frac{1}{2} 13 + \frac{1}{2} 3}{2 + 53 + 5 + 13 + 3 + 21} = \frac{10}{97} = 0.1030928 \\
+P_b &= \frac{53 + \frac{1}{2} 13 + \frac{1}{2} 21}{97} = \frac{70}{97} = 0.7216495 \\
+P_c &= \frac{5 + \frac{1}{2} 3 + \frac{1}{2} 21}{97} = \frac{17}{97} = 0.1752577
+\end{align}
+
+Under HW equilibrium:
+
+\begin{align}
+E_{aa} &= N * P_a^2 = 97 * 0.1030928^2 = 1.030928 \\
+E_{bb} &= N * P_b^2 = 97 * 0.7216495^2 = 50.51547 \\
+E_{cc} &= N * P_c^2 = 97 * 0.1752577^2 = 2.97938 \\
+E_{ab} &= N * 2P_a P_b = 97 * 2 * 0.1030928 * 0.7216495 = 14.43299 \\
+E_{ac} &= N * 2P_a P_c = 97 * 2 * 0.1030928 * 0.1752577 = 3.505155 \\
+E_{bc} &= N * 2P_b P_c = 97 * 2 * 0.7216495 * 0.1752577 = 24.53608
+\end{align}
+
+
+\textbf{3.} A small island is colonized by a monoecious (hermaphroditic) plant.
+The population size remains constant at 40 individuals. Consider an autosomal
+locus that initially has heterozygosity of 0.4. 
+
+\textbf{(a)} What is the expected heterozygosity after 55 generations?
+
+Assuming that only self-fertilization occurs, the heterozygosity will decrease
+by 50 percent each generation because only 50 \% of selfing heterozygotes'
+offspring are heterozygous themselves at a given locus.
+
+$Het_{t=55} = .4 * .5^{55} = 1.110223 * 10^{-17} \approx 0$
+
+\textbf{(b)} If the population size had been 400, what would the expected heterozygosity
+be after 55 generations?
+
+Heterozygosity is the frequency of heterozygotes in the population, and is
+independent of population tize. The heterozytote frequencies at 55 generations
+will remain the same for a population of 40 or 400 selfing individuals.
+
+$Het_{t=55} = .4 * .5^{55} = 1.110223 * 10^{-17} \approx 0$
+
+
+\textbf{4.} Suppose five random copies of a gene were sequenced. Assume the
+gene is 1200 base pairs long, and that all sites were monomorphic (unvarying)
+in this sample except for six nucleotide sites. The sequences at the variable
+sites were: 
+
+seq 1: AAAAAG seq 2: CTAGAG seq 3: AACATG seq 4: AACATG seq 5: CTAGAT 
+
+\textbf{(a)} Calculate the nucleotide diversity using the average number of pairwise
+differences between the sampled copies. 
+
+\begin{minted}[linenos,numbersep=.5em]{r}
+countPairwiseDifferences <- function(sequence1, sequence2) {
+  str1array = strsplit(sequence1, "")[[1]]
+  str2array = strsplit(sequence2, "")[[1]]
+  count = 0
+  for (i in 1:length(str1array)) {
+    if (str1array[i] != str2array[i]) {
+      count = count + 1
+    }
+  }
+  return(count)
+}
+
+sequences = c("AAAAAG", "CTAGAG", "AACATG", "AACATG", "CTAGAT")
+
+nSites = 1200
+totalPairwiseDifferences <- 0
+sequenceCombinations <- combn(sequences, 2)
+for (i in 1:dim(sequenceCombinations)[2]) { 
+  totalPairwiseDifferences = totalPairwiseDifferences + 
+    countPairwiseDifferences(sequenceCombinations[1,i], sequenceCombinations[2,i])
+}
+
+nucleotideDiversity = totalPairwiseDifferences * 1/5 * 1/5 / nSites # 1/5 <- allele frequency
+
+[1] 0.001133333
+\end{minted}
+
+Nucleotide diversity across all 1200 base pairs is $\pi = 0.002833333$.
+
+\textbf{(b)} Consider the following data, (obtained from the above data by simply
+scrambling the alleles within columns). 
+
+seq 1: ATAATG seq 2: AAAGAG seq 3: CACAAG seq 4: ATCATG seq 5: CAAGAT 
+
+By construction, the allele frequencies are the same as in the previous
+example, so the nucleotide diversity must be the same. Verify that the average
+number of pairwise differences is the same as before. 
+
+\begin{minted}[linenos,numbersep=.5em]{r}
+sequences = c("ATAATG", "AAAGAG", "CACAAG", "ATCATG", "CAAGAT")
+
+nSites = 1200
+totalPairwiseDifferences <- 0
+sequenceCombinations <- combn(sequences, 2)
+for (i in 1:dim(sequenceCombinations)[2]) { 
+  totalPairwiseDifferences = totalPairwiseDifferences + 
+    countPairwiseDifferences(sequenceCombinations[1,i], sequenceCombinations[2,i])
+}
+
+nucleotideDiversity = totalPairwiseDifferences * 1/5 * 1/5 / nSites # 1/5 <- allele frequency
+
+[1] 0.001133333
+\end{minted}
+
+The diversity measured from the permuted data is identical to that from the original.
+
+\textbf{(c)} Calculate Watterson’s estimator of $\theta$ per base pair. (The estimate
+based on the number of segregating sites.) Compare this estimate to the
+estimate of $\theta$ per base pair based on nucleotide diversity. Why might
+they differ?
+
+The calculation for Watterson's estimator is:
+
+\begin{align}
+  \hat\theta_w &= \frac{K}{a_n}
+\end{align}
+
+In this case, $K = 6$ and $a_n$ is the harmonic sum of 1200:
+
+\begin{align}
+  a_n &= \sum^{n-1}_{i=1}\frac{1}{i} \\
+  &= \frac{1}{1} + \frac{1}{2} + \frac{1}{3} + \ldots + \frac{1}{1198} + \frac{1}{1199} \\
+  &\approx 7.666042
+\end{align}
+
+Therefore, $\hat\theta_w = \frac{6}{7.666042} \frac{1}{1200} = 0.0006522271$.
+
+Watterson's estimator is less than the nucleotide diversity in this case. They
+differ because they are computed differently.
+
+Nucleotide diversity relies on a frequency-scaled count of the pairwise
+differences along different alleles, where SNPs at each site can be considered
+independently from the others. The Watterson's estimator instead makes the
+assumption that there is no recombination along segregating sites, meaning
+unique sequences are generated by combinations of SNPs that are inherited as a
+unit. The metric is concerned with how K segregating sites are distributed
+along a tract of DNA\@ given some sample of the population. The harmonic sum in
+its denominator is in a sense a correction factor for the likelihood of
+sampling to fail to capture rare variants in the population.
+
+The difference in the measured $\pi$ and $\theta$ could be due to unspecified
+population structure, such as variation in population size over time, or other
+violations of model assumptions.
+
+
+\textbf{5.} Consider a population surveyed at two loci that are 1cM apart, with
+two alleles at each locus. (1cM means that the recombination fraction is 0.01).
+Suppose a large sample was genotyped and the frequencies of the four possible
+haplotypes were: 
+
+$freq(A_1 – B_1) = 0.4$
+
+$freq(A_1 – B_2) = 0.2$
+
+$freq(A_2 – B_1) = 0.1$
+
+$freq(A_2 – B_2) = 0.3$
+
+\textbf{(a)} What is the frequency of $A_1$ and $B_1$?
+
+$freq_{A_1} = .4 + .2 = .6$ \\
+$freq_{B_1} = .4 + .1 = .5$ \\
+
+\textbf{(b)} What is the linkage disequilibrium (D)
+
+$D = freq_{A_1 B_1} - freq_{A_1}freq_{B_1} = .4 - .6*.5 = .1$
+
+\textbf{(c)} Assuming no mutation, selection or drift, what allele frequencies, gamete
+frequencies and linkage disequilibrium do you expect after 100 generations of
+random mating?
+
+$D_{t} = (1-r)^t D_0$
+
+After 100 generations with $D_0 = .1$ and $r = .01$:
+
+$D_{t=100} = (1-.01)^{100} *.1 = 0.03660323$
+
+Given that there is no mutation, selection, or drift, the allele frequencies
+will remain same within the population, so the genotype frequencies will
+become:
+
+\begin{align}
+freq_{A_1 B_1} &= D + freq_{A_1} freq_{B_1} \\
+  &= 0.03660323 + .6*.5 = 0.33660323 \\
+freq_{a_1 b_1} &= D + freq_{a_1} freq_{b_1} \\
+  &= 0.03660323 + .4*.5 = 0.23660323 \\
+freq_{A_1 b_1} &= freq_{A_1} freq_{b_1} - D \\
+  &= .6*.5 - 0.03660323 = 0.2633968 \\
+freq_{a_1 B_1} &= freq_{a_1} freq_{B_1} - D \\
+  &= .4*.5 - 0.03660323 = 0.1633968
+\end{align}
+
+
+\textbf{6.} An anthropologist found that, in a population with a complicated
+system of kin marriages, 17 of 800 people are homozygous for isozyme allele AS.
+Later the marriage system broke down and mating became random. The frequency of
+these homozygotes then dropped to 0.01. What was the average inbreeding
+coefficient under the old system?
+
+The frequency of AS homozygotes being .01 with random mating and .02125 under
+the old system. Assuming the underlying allele frequencies remained constant
+over time, $p_{AS} = \sqrt{p_{AS/AS}} = \sqrt{.01} = .1$.
+
+The imbreeding coefficient F is given by:
+
+\begin{align}
+  F &= \frac{p_{AS,AS} - p_{AS}^2}{p_{AS} - p_{AS}^2} \\
+    &= \frac{\frac{17}{800} - .1^2}{.1 - .1^2} \\
+    &= 0.125
+\end{align}
+
+
+\textbf{7.} The formula $H = \frac{4N_e u}{4N_e u + 1}$ measures absolute
+heterozygosity, whereas the formula $H_t = H_0(1 - \frac{1}{2N_e})^t$ measures
+only relative heterozygosity. What assumption, other than selective
+neutrality, is required to make the first formula correct?
+
+The first formula represents the equilbrium heterozygosity given random
+mutations and drift. It makes the assumpation that there are infinitely many
+mutable sites, meaning that each mutation is unique.
+
+
+\textbf{8.} Which are most closely related ($F_{ij}$) for X-linked loci: brothers,
+sisters, or brother and sister?
+
+Sisters inherit one X chromosome from their father, so they will be on average
+100\% identical for one chromosome and 50\% identical for the one they inherit
+from their mother due to recombination.
+
+$F_{ij} = .5 * .5 + .5 * 1 = .75$
+
+Brothers will only share on average 50\% of loci on the single X chromosome
+they inherit from their mother.
+
+$F_{ij} = 1 * .5 = .5$
+
+Brothers and sisters will share 50\% of loci on the X inherited maternally, and
+all loci daughters inherit from their father will not be shared by their
+brothers because they inherited a Y chromosome instead.
+
+For brother and sister:
+
+$F_{ij} = 1 * .5 = .5$
+
+For sister and brother:
+
+$F_{ij} = .5 * .5 + 0 * .5 = .25$
+
+Therefore, for X-linked loci, sisters are most closely related to one another
+than other sets of siblings.
+
+\end{essaystyle}
+\end{document}
