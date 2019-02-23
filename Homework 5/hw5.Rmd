@@ -1,0 +1,338 @@
+---
+title: "Homework 5"
+author: "Ansel George"
+output: pdf_document
+---
+
+```{r}
+library(ggplot2)
+
+set.seed(10)
+```
+
+
+# 1
+
+*Consider the rescaled relative population size function*
+
+\[
+  f(t) = \left\{
+     \begin{array}{@{}l@{\thinspace}l}
+       1  & \text{ for } t < 0.05 \\
+       10 & \text{ for } t \ge 0.05 \\
+     \end{array}
+   \right.
+\]
+
+*which models a recent bottleneck extending up to the present.*
+
+## a)
+
+*Assuming $N_0 = 10000$, what is the size of the population at present? What was
+the size before the bottleneck? How many generations ago did the bottleneck
+start?*
+
+$N_0$, the reference population size, is defined as the population size at
+present, which in this case is $10000$.
+
+The population size at the bottleneck, which occurred at time $t = .05$,
+evaluates to $10 * 10000 = 100000$.
+
+The time of the bottleneck (in the number of generations) is $2 N_0 t = 2 *
+10000 * .05 = 1000$.
+
+
+## b)
+
+*Compute the cumulative coalescent rate function:*
+
+\begin{align*}
+\Lambda(t) := \int_{s=0}^t \frac{1}{f(s)} ds
+\end{align*}
+
+When $t < .05$
+\begin{align*}
+\Lambda(t) &= \int^t_{s=0} \frac{1}{1} ds = t
+\end{align*}
+
+When $t \ge .05$
+\begin{align*}
+\Lambda(t) &= \int^{.05}_{s=0} \frac{1}{1} ds + \int^{t}_{s=0.05} \frac{1}{10} ds \\
+  &= .05 + \frac{t}{10} - \frac{.05}{10} \\
+  &= \frac{t}{10} + .045
+\end{align*}
+
+Together:
+
+\[
+  \Lambda(t) = \left\{
+     \begin{array}{@{}l@{\thinspace}l}
+       t  & \text{ for } t < 0.05 \\
+       \frac{t}{10} + .045 & \text{ for } t \ge 0.05
+     \end{array}
+   \right.
+\]
+
+
+## c)
+
+*In class we showed that*
+
+\begin{align*}
+\mathbb{P} \big\{ T^{(k)}_k > t \big\} = \mathrm{e}^{- { k \choose 2 } \Lambda(t)}
+\end{align*}
+
+*holds for the first-coalescence time $T_k^{(k)}$ of $k$ lineages. Compute the
+expected value*
+
+\begin{equation*}
+\mathbb{E}\big[ T_k^{(k)} \big] = \int_{t=0}^\infty \mathbb{P}\big\{T^{(k)}_k > t \big\}dt
+\end{equation*}
+
+Separating the equation into two conditions, when $t < .05$:
+
+\begin{align*}
+\mathbb{E}\big[ T_k^{(k)} \big] &= \int_{t=0}^\infty \mathbb{P}\big\{T^{(k)}_k > t \big\}dt \\
+  &= \int_{t=0}^\infty \mathrm{e}^{- { k \choose 2 } \Lambda(t)} dt \\
+  &= \int_{t=0}^{.05} \mathrm{e}^{- { k \choose 2 } t} dt + \int_{t=0.05}^\infty \mathrm{e}^{- { k \choose 2 } \big( \frac{t}{10} + .045 \big) } dt\\
+  &= \frac{-1}{ { k \choose 2 } } \big( \left. e^{ -{ k \choose 2 } t } \right|^{.05}_0 \big) + \frac{-10}{ { k \choose 2 } } e^{ -{ k \choose 2 } .045 } \big( \left.  e^{ -{ k \choose 2 } \frac{t}{10} } \right|^{\infty}_{.05} \big) \\
+  &= \frac{1}{ { k \choose 2 } } \Big( 1 - e^{ -{ k \choose 2 } .05 } + 10e^{ -{ k \choose 2 } .045 } e^{ -{ k \choose 2 } \frac{.05}{10} } \Big) \\
+  &= \frac{1}{ { k \choose 2 } } \Big( 1 - e^{ -{ k \choose 2 } .05 } + 10e^{ -{ k \choose 2 } .05 } \Big) \\
+  &= \frac{1}{ { k \choose 2 } } \Big( 1 + 9e^{ -{ k \choose 2 } .05 } \Big)
+\end{align*}
+
+
+# 2
+
+*Consider a sample of haplotypes observed at 3 loci. The possible alleles at the
+first locus are $\{a, A\}$, at the second locus $\{b, B\}$, and at the third
+locus $\{c, C\}$. Denote by $n_{a,b,c}$ the number of haplotypes in the sample
+with alleles $(a, b, c)$ at the respective loci, $n_{a,b,C}$ the number of
+haplotypes with alleles $(a, b, C)$, and so forth... Assume that we observe a
+sample of haplotypes of size 20 given by:*
+
+\begin{equation}
+  \left(
+  \begin{array}{c}
+    n_{a,b,c} \\
+    n_{a,b,C} \\
+    n_{a,B,c} \\
+    n_{a,B,C} \\
+    n_{A,b,c} \\
+    n_{A,b,C} \\
+    n_{A,B,c} \\
+    n_{A,B,C} \\
+  \end{array}
+  \right) =
+  \left(
+    \begin{array}{c}
+      2 \\
+      4 \\
+      2 \\
+      4 \\
+      3 \\
+      1 \\
+      2 \\
+      2 \\
+    \end{array}
+   \right)
+\end{equation}
+
+
+*We had defined linkage disequilibrium $r^2_{a,c}$ as*
+
+\begin{equation*}
+r^2_{a,c} := \frac{D^2_{a,c}}{\hat{p}_{a}\hat{p}_{A}\hat{p}_{c}\hat{p}_{C}}
+\end{equation*}
+
+*with*
+
+\begin{equation*}
+D_{a,c} := \hat{p}_{a,c} - \hat{p}_{a}\hat{p}_{c}
+\end{equation*}
+
+*with empirical haplotype frequency*
+
+\begin{equation*}
+\hat{p}_{a,c} = \frac{n_{a,c}}{n}
+\end{equation*}
+
+*and the empirical allele frequency*
+
+\begin{equation*}
+\hat{p}_{a} = \frac{n_{a}}{n}
+\end{equation*}
+
+*Here $n_{a,c}$ is the number of haplotypes in the sample that have allele $a$
+at the first locus and allele $c$ at the third, and $n_a$ is the number of
+haplotypes with allele $a$ at the first locus. The same definitions hold for
+the other alleles. Compute $r_{a,b}$, $r_{a,c}$, and $r_{b,c}$ for the sample
+given equation (1).*
+
+
+$p_a = \frac{2+4+2+4}{20} = 0.6$  
+$p_b = \frac{2+4+3+1}{20} = 0.5$  
+$p_c = \frac{2+2+3+2}{20} = 0.45$  
+
+$p_{a,b} = \frac{2+4}{20} = 0.3$  
+$p_{a,c} = \frac{2+2}{20} = 0.2$  
+$p_{b,c} = \frac{2+3}{20} = 0.25$  
+
+$D_{a,b} = \hat{p}_{a,b} - \hat{p}_{a}\hat{p}_{b} = .3 - .6*0.5 = 0$  
+$D_{a,c} = \hat{p}_{a,c} - \hat{p}_{a}\hat{p}_{c} = .2 - .6*0.45 = -0.07$  
+$D_{b,c} = \hat{p}_{b,c} - \hat{p}_{b}\hat{p}_{c} = .25 - .5*0.45 = 0.025$  
+
+$r^2_{a,b} = \frac{D^2_{a,b}}{\hat{p}_{a}\hat{p}_{A}\hat{p}_{b}\hat{p}_{B}} = \frac{(0)^2}{0.6(1-.06).5(1-.5)} = 0$  
+$r^2_{a,c} = \frac{D^2_{a,c}}{\hat{p}_{a}\hat{p}_{A}\hat{p}_{c}\hat{p}_{C}} = \frac{(0.07)^2}{0.6(1-.06).45(1-.45)} = 0.08249158$  
+$r^2_{b,c} = \frac{D^2_{b,c}}{\hat{p}_{b}\hat{p}_{B}\hat{p}_{c}\hat{p}_{C}} = \frac{(0.025)^2}{0.5(1-.05).45(1-.45)} = 0.01010101$  
+
+$r_{a,b} = \sqrt{0} = 0$  
+$r_{a,c} = \sqrt{0.08249158} = 0.2872135$  
+$r_{b,c} = \sqrt{0.01010101} = 0.1005038$  
+
+
+# 3
+
+*Given a sample size $n$, a recombination rate $\rho$, and the sequence length
+$L$, recall that in the full ancestral recombination graph (not reduced),
+recombination occurs at rate $\frac{\rho}{2}(L - 1)$ along each lineage, and
+the lineage branches into two new lineages. Furthermore, coalescence occurs
+between each pair of lineages at rate one. Consider the so-called genealogical
+ancestral process $G_n (t)$ that gives the total number of ancestral lineages
+in the full ARG at time $t$ before present (regardless which loci these
+lineages are ancestral to). This process starts out with $G_n (0) = n$
+lineages. Whenever there are $k$ lineages, this number is increased to $k + 1$
+at rate $k \frac{\rho}{2}L$ or decreased to $k - 1$ at rate ${k \choose 2}$.*
+
+*Implement an R-function that simulates realizations of $G_n (t)$. To this end,
+for each trajectory, set the initial number of lineages to $n = k$. After an
+exponentially distributed time with parameter $n \frac{\rho}{2}(L - 1) + {n
+\choose 2}$ the number of lineages increases by one with probability*
+
+\begin{equation*}
+\frac{k\frac{\rho}{2}(L-1)}{k\frac{\rho}{2}(L-1) + {k \choose 2}}
+\end{equation*}
+
+*and decreases by one with probability*
+
+\begin{equation*}
+\frac{ {k \choose 2} }{k\frac{\rho}{2}(L-1) + {k \choose 2}}
+\end{equation*}
+
+*Update the number of lineages $k$ and repeat this procedure with the updated
+number until there is only one lineage left (the ultimate most recent common
+ancestor). Use this program to simulate $1000$ trajectories with $n = 10$, $L =
+200$, and $\rho = 0.02$. How many trajectories reach $1$ before $t = 20$?*
+
+```{r}
+simulateAncestralProcess <- function(n, L, rho) {
+  k <- n
+  time <- 0
+  while(k != 1) {
+    t <- rexp(1, (choose(k, 2) + k*rho*(L-1)/2))
+    p <- choose(k, 2) / (choose(k, 2) + k*rho*(L-1)/2)
+    if (runif(1) < p) {
+      k <- k - 1
+    } else {
+      k <- k + 1
+    }
+    time <- time + t
+  }
+  return(time)
+}
+```
+
+```{r}
+n <- 10
+L <- 200
+rho <- .02
+iter <- 1000
+
+simulations <- list()
+simulations <- rep(0, iter)
+for (i in 1:iter) {
+  simulations[i] <- simulateAncestralProcess(n, L, rho)
+}
+
+sum((simulations) < 20)
+```
+
+For this simulation, 918 lineages out of 1000 coalesce to a single common
+ancestor in less than 20 generations.
+
+
+# 4
+
+*Consider two loci with possible alleles $\{a, A\}$ at the first locus and $\{b,
+B\}$ at the second loci, and recombination rate $\rho$ between these two loci.
+In class, we had shown that under the Coalescent with Recombination, the
+expected value of the linkage disequilibrium*
+
+\begin{equation*}
+\mathbb{E}[r^2] = \mathbb{E}\bigg[ \frac{D_{AB}}{p_A p_a p_B p_b} \bigg]
+\end{equation*}
+
+*can be approximated by*
+
+\begin{equation*}
+\sigma^2_d = \frac{\rho + 10}{\rho^2 + 13\rho + 22}
+\end{equation*}
+
+
+## a)
+
+*Using R, plot this function for $\rho$ between 0 and 50. What is the value of
+the function at $\rho$ = 0? What is 5% of this value?*
+
+```{r}
+f <- function(x) {
+  return((x+10)/(x^2 + 13*x + 22))
+}
+
+rho <- seq(0,50,.01)
+
+qplot(rho, f(rho))
+```
+
+When $\rho=0$, $\sigma^2_d = \frac{10}{22}$. 5% of this value is $\frac{1}{44}$.
+
+
+## b)
+
+*Calculate the (positive) $\rho$ for which $\sigma_d^2$ is equal to 5% of its
+value at $\rho = 0$. Thus, the correlation between two sites at this distance
+$\rho$ is only 5%.*
+
+The expression for $\sigma^2_d$ is 5% of the value at $\rho = 0$ when $\rho =
+41.15638$
+
+\begin{align}
+.05 \frac{10}{22} &= \frac{\rho + 10}{\rho^2 + 13\rho + 22} \\
+\frac{1}{44} &= \frac{\rho + 10}{\rho^2 + 13\rho + 22} \\
+\rho^2 + 13\rho + 22 &= 44\rho + 440 \\
+(\rho - \frac{31}{2})^2 &= 418 + \frac{31^2}{2^2} \\
+\rho - \frac{31}{2} &= \sqrt{418 + \frac{31^2}{2^2}} \\
+\rho &= \sqrt{418 + \frac{31^2}{4}} + \frac{31}{2} \\
+  &\approx 41.15638
+\end{align}
+
+
+## c)
+
+*Recall the formula $\rho = 4N_e r$, that relates the coalescent-scaled
+recombination rate $\rho$ to the per generation recombination probability $r$.
+Assuming $N_e = 10000$, a per base-pair per generation recombination
+probability of $r = 1.25 * 10^{-8}$ , how many base-pairs (bp) does this $\rho$
+correspond to?*
+
+From the units of the expression, $\rho = 4N_e r$:
+
+$r \textrm{ recombinations per bp } * x \textrm{ bp } = \textrm{ recombinations
+per generation }$
+
+\begin{align}
+\rho &= r N_e r_{bp} x_{bp} \\
+\implies x_{bp} &= \frac{\rho}{4 N_e r_{bp}} \\
+  &= \frac{41.15638}{1.25 * 10^-8 * 4 * 10000} \\
+  &= 82312.76
+\end{align}
