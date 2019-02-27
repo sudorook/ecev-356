@@ -1,4 +1,12 @@
 #
+#
+#
+
+*.tgz
+*.tar.gz
+
+
+#
 # IPython
 #
 
