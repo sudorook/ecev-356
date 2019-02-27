@@ -4,6 +4,13 @@ author: "Ansel George"
 output: pdf_document
 ---
 
+```{r, message=F}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+```
+
+
 # 1
 
 We had shown in class that under the Sequentially Markovian Coalescent (SMC)
@@ -23,6 +30,26 @@ Show that for $\rho \neq 1$, this is equal to
 \end{align}
 
 What if this is equal to if $\rho = 1$?
+
+When $\rho \neq 1$,
+
+\begin{align}
+p_{\rho}(t_\ell|t_{\ell-1}) &= e^{-\rho t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + (1 - e^{\rho t_{\ell-1}}) \int_0^{\textrm{min}(t_\ell, t_{\ell-1})} \frac{\rho e^{-\rho t_b}}{1 - e^{-\rho t_{\ell-1}}} e^{-(t_\ell - t_b)} dt_b \\
+  &= e^{-\rho t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + \int_0^{\textrm{min}(t_\ell, t_{\ell-1})} \rho e^{-\rho t_b} e^{-(t_\ell - t_b)} dt_b \\
+  &= e^{-\rho t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + \rho e^{-t_\ell} \int_0^{\textrm{min}(t_\ell, t_{\ell-1})} e^{-\rho t_b + t_b} dt_b \\
+  &= e^{-\rho t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + \frac{\rho}{1-\rho} e^{-t_\ell} \big[ e^{-t_b(\rho - 1)} \big]_0^{\textrm{min}(t_\ell, t_{\ell-1})} \\
+  &= e^{-\rho t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + \frac{\rho}{1-\rho} e^{-t_\ell} \big( e^{(1 - \rho){\textrm{min}(t_\ell, t_{\ell-1})}} - 1\big)
+\end{align}
+
+When $\rho = 1$,
+
+\begin{align}
+p_{\rho=1}(t_\ell|t_{\ell-1}) &= e^{-t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + (1 - e^{t_{\ell-1}}) \int_0^{\textrm{min}(t_\ell, t_{\ell-1})} \frac{e^{-t_b}}{1 - e^{-t_{\ell-1}}} e^{-(t_\ell - t_b)} dt_b \\
+p_{\rho=1}(t_\ell|t_{\ell-1}) &= e^{-t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + \int_0^{\textrm{min}(t_\ell, t_{\ell-1})} e^{-t_b} e^{-(t_\ell - t_b)} dt_b \\
+p_{\rho=1}(t_\ell|t_{\ell-1}) &= e^{-t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) + \int_0^{\textrm{min}(t_\ell, t_{\ell-1})} e^{-t_\ell} dt_b \\
+p_{\rho=1}(t_\ell|t_{\ell-1}) &= e^{-t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) +  e^{-t_\ell} \int_0^{\textrm{min}(t_\ell, t_{\ell-1})} dt_b \\
+p_{\rho=1}(t_\ell|t_{\ell-1}) &= e^{-t_{\ell-1}} \delta(t_\ell - t_{\ell-1}) +  e^{-t_\ell} \textrm{min}(t_\ell, t_{\ell-1})
+\end{align}
 
 
 # 2
@@ -49,6 +76,24 @@ and T_2 is given by
 Write an R function to plot both of these functions for $\rho$ between $0$ and
 $20$. Plot them in the sample plot using different colors.
 
+```{r}
+coalesceReco <- function(rho) {
+  return((rho + 18)/(rho^2 + 13*rho + 18))
+}
+
+coalesceSMC <- function(rho) {
+  return(1/(1+rho))
+}
+```
+
+```{r}
+rho <- seq(1, 20, .1)
+
+f <- tbl_df(data.frame(rho=rho, C_Reco=coalesceReco(rho), C_SMC=coalesceSMC(rho)))
+f_melt <- f %>% gather(., Param, Value, -rho)
+ggplot(f_melt) + aes(x=rho, y=Value, color=Param) + geom_line()
+```
+
 
 ## b)
 
@@ -56,10 +101,182 @@ For both functions, what are the values for $\rho = 1$, and what are the values
 for $\rho \rightarrow \infty$? Provide a mathematical argument. A visual
 argument from the plot is not sufficient.
 
+When $\rho=1$, $\mathbb{C}^{\textrm{reco}}(T_1,T_2) = \frac{19}{32}$ and
+$\mathbb{C}^{\textrm{SMC}}(T_1,T_2) = \frac{1}{2}$
+
+When $\rho \rightarrow \infty$, by L'Hospital's Rule:
+
+\begin{align} \frac{d}{d\rho} \rho^2 + 13\rho + 18 &=  2 \rho \\
+\frac{d}{d\rho} \rho + 18 &= 1 \\ \implies \lim_{\rho \rightarrow \infty}
+\mathbb{C}^{\textrm{reco}}(T_1,T_2) &= \frac{1}{2\rho} = 0 \end{align}
+
+And for $\mathbb{C}^{\textrm{SMC}}(T_1,T_2)$,
+
+\begin{align} \lim_{\rho \rightarrow \infty} \mathbb{C}^{\textrm{SMC}}(T_1,T_2)
+= \frac{1}{1+\rho} = 0 \end{align}
 
 # 3
+
+Implement a function in R that allows you to simulate a sequence of coalescence
+times
+
+\begin{equation}
+T_1, T_2, T_3, \hdots, T_L
+\end{equation}
+
+along the chromosome under the Sequentially Markovian Coalescent (SMC) for a
+sample of size $2$ with an arbitrary number of loci $L$, and an arbitrary
+recombination rate $\rho$. Proceed as follows:
+
+* The coalescent time at the first locus $T_1$ is simulated from an exponential
+  distribution with parameter $1$.
+
+* To simulate $T_\ell$ , given that the previous time $T_{\ell-1}$ has already
+  been simulated:
+
+  1. Simulate an exponentially distribution random variable $T_b$ with
+     parameter $\rho$.
+  2. If $T_b > T_{\ell-1}$, then coalescence happens before recombination. In
+     this case, set $T_\ell = T_{\ell-1}$.
+  3. If $T_b < T_{\ell-1}$, then recombination decouples the two lineages. In
+     this case, set $T_\ell = T_a + T_b$, where $T_a$ is an exponentially
+     distributed coalescence time with parameter $1$.
+
+* Repeat until you have simulated the full sequence:
+
+\begin{equation}
+T_1, T_2, T_3, \hdots, T_L
+\end{equation}
+
+```{r}
+runSMC <- function(L, rho) {
+  times <- rep(0, L)
+  times[1] <- rexp(1,1)
+  for (i in 2:L) {
+    Tb <- rexp(1,rho)
+    if (Tb > times[i-1]) {
+      times[i] <- times[i-1]
+    } else {
+      times[i] <- Tb + rexp(1,1)
+    }
+  }
+  return(times)
+}
+```
+
+
+Use this implementation to simulate $1000$ sequences of coalescence times with
+$L = 20$ and $\rho = 0.2$. Collect the $1000$ different values of $T_1$ that
+you observe, and plot a histogram of these (R function: `hist()`). Furthermore,
+collect the $1000$ different values of $T_L$ that you observe, and plot a
+histogram of these. Compare the two histograms, highlighting their similarities
+and differences. Why would you expect these similarities and differences?
+
+```{r}
+N <- 1000
+L <- 20
+rho <- .2
+
+sequences <- matrix(0, N, L)
+for (i in 1:N) {
+  sequences[i,] <- runSMC(L, rho)
+}
+```
+
+```{r}
+hist(sequences[,1], breaks=20)
+hist(sequences[,L], breaks=20)
+
+qqplot(sequences[,1], sequences[,L])
+abline(0,1,col='red')
+```
+
+The marginal distributions for any given site are $\sim exp(1)$, so the
+histograms for $T_1$ and $T_L$ should be the same.
 
 
 # 4
 
+Download the additional file "haps.txt" and load it in R. The file contains a
+matrix $S$ of genetic types under the Infinitely-Many-Sites model. It has $30$
+columns, corresponding to the $30$ segregating sites, and $20$ rows,
+corresponding to the $20$ haplotypes in the sample. Recall that $S_{i,j}$ is
+the allele of haploype $i$ at segregating site $j$. The first $10$ rows
+(haplotypes) are sampled from the first sub-population, the remaining
+haplotypes are sampled from the second sub-population.
 
+## a) 
+Write an R function that computes the sub-population heterozygosity $H_S$ in
+the first sub-population, averaged across sites, and the heterozygosity $H_T$
+for the total population, averaged across sites.
+
+```{r}
+computeHeterozygosity <- function(haps) {
+  p <- apply(haps, 2, mean)
+  H <- 2*p*(1-p)
+  return(mean(H))
+}
+
+computeHs <- function(haps, Z) {
+  H <- rep(0, length(Z))
+
+  p <- matrix(0, 1, ncol(haps))
+  for (i in 1:length(Z)) {
+    p <- apply(haps[Z[[i]],], 2, mean)
+    H[i] <- mean(2*p*(1-p))
+  }
+  return(H)
+}
+
+computeHt <- function(haps, Z) {
+  p <- apply(haps, 2, mean)
+  H <- 2*p*(1-p)
+  return(mean(H))
+}
+
+```
+
+```{r}
+haplotypes <- read.table("haps.txt", sep=" ", header=F)
+subpopulations <- list(S1=c(1:10), S2=c(11:20))
+
+Hs <- computeHs(haplotypes, subpopulations)
+Ht <- computeHt(haplotypes)
+
+Hs
+Ht
+```
+
+Hs for the first subpopulation is 0.3820000, and total heterozygosity Ht is
+0.4605.
+
+
+## b)
+Use these results to determine the value of $F\_{ST}$ and compute an estimate
+for the migration rate $m$ under the symmetric island model, where the number
+of sub-populations is given as $d = 2$.
+
+
+```{r}
+computeFst <- function(haps, Z) {
+  Hs <- computeHs(haps, Z)
+  Ht <- computeHt(haps)
+
+  return((Ht-Hs)/Ht)
+}
+
+estimateMigration <- function(Fst, d) {
+  return((d-1)/d^2 * (1/Fst - 1))
+}
+```
+
+```{r}
+Fst <- computeFst(haplotypes, subpopulations)
+m <- estimateMigration(Fst, 2)
+
+Fst
+m
+```
+
+Fst for the first subpopulation (first 10 rows) is 0.17046688, and its
+estimated migration rate is 1.216561.
