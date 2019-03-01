@@ -282,3 +282,27 @@ drift (no mutation, no selection). Thus, we have $\mu(y) = 0$ and $\sigma^2 (y)
 derivative, by substituting the forward equation and using integration by
 parts. You can assume that the terms for $y = 0$ and $y = 1$ are $0$. What does
 this derivative imply for the change of the expected heterozygosity over time?*
+
+
+\begin{align}
+\frac{\partial}{\partial t} \mathbb{E}_x [h(Y_t)] &= \int_0^1 h(y) \frac{\partial}{\partial t}\{p(t;x,y)\}dy \\
+  &= \int_0^1 h(y) \Big( \frac{\partial}{\partial y} \{ \mu (y) p(t;x,y) \} + \frac{1}{2} \frac{\partial^2}{\partial y^2} \{ \sigma^2 (y) p(t;x,y) \} \Big)dy \\
+  &= \int_0^1 h(y) \Big( \frac{\partial}{\partial y} \{ 0 p(t;x,y) \} + \frac{1}{2} \frac{\partial^2}{\partial y^2} \{ \sigma^2 (y) p(t;x,y) \} \Big)dy \\
+  &= \int_0^1 h(y) \frac{1}{2} \frac{\partial^2}{\partial y^2} \{ \sigma^2 (y) p(t;x,y) \} dy \\
+  &= \big[\frac{1}{2} h(t) \frac{\partial}{\partial y} \{ \sigma^2 (y) p(t;x,y) \} \big]^1_0 - \int_0^1 h^\prime (y) \frac{1}{2} \frac{\partial}{\partial y} \{ \sigma^2 (y) p(t;x,y) \} dy \\
+  &= 0 - \int_0^1 h^\prime (y) \frac{1}{2} \frac{\partial}{\partial y} \{ \sigma^2 (y) p(t;x,y) \} dy \\
+  &= -\big[\frac{1}{2} h^\prime (t) \sigma^2 (y) p(t;x,y) \big]^1_0 + \int_0^1 h^{\prime\prime}(y) \frac{1}{2}\sigma^2 (y) p(t;x,y)dy \\
+  &= 0 + \int_0^1 h^{\prime\prime}(y) \frac{1}{2}\sigma^2 (y) p(t;x,y)dy \\
+  &= \int_0^1 (-4) \frac{1}{2}(y(1-y)) p(t;x,y)dy \\
+  &= \int_0^1 -2(y(1-y) p(t;x,y)dy \\
+  &= - \int_0^1 2(y(1-y) p(t;x,y)dy \\
+  &= - \int_0^1 h(y) p(t;x,y)dy \\
+  &= -\mathbb{E}_x [h(Y_t)] \\
+\implies \frac{d \mathbb{E}_x [h(Y_t)]}{\mathbb{E}_x [h(Y_t)]} &= -dt \\
+\implies ln\big(\mathbb{E}_x [h(Y_t)]\big) &= -t + ln(C) \\
+\implies \mathbb{E}_x [h(Y_t)] &= Ce^{-t} \\
+\implies \mathbb{E}_x [h(Y_t)] &= Y_0 e^{-t}\textrm{, given }\mathbb{E}_x [h(Y_{t=0})] = Y_0
+\end{align}
+
+This result means that the expected heterozygosity in a population undergoing
+Wright-Fisher diffusion will decline exponentially over time.
