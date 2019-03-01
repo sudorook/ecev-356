@@ -270,7 +270,7 @@ allele. With initial frequency $x$, how does the expected heterozygosity*
 \end{equation}
 
 *change over time under the neutral Wright-Fisher diffusion with just genetic
-drift (no mutation, no selection). Thus, we have $\mu(y) = 0$ and $\sigma_2 (y)
+drift (no mutation, no selection). Thus, we have $\mu(y) = 0$ and $\sigma^2 (y)
 = y(1 - y)$. To this end, consider the derivative with respect to time*
 
 \begin{align}
