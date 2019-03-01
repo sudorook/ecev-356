@@ -84,8 +84,8 @@ mean(wfpop2[,ngenerations] == 1)
 \mathbb{P}_x \{T_1 < T_0\} = \frac{1-e^{-2\alpha x}}{1-e^{-2\alpha}}
 \end{align}
 
-*as a function of the initial frequency $x \in [0, 1]$ for $\alpha_1 = 2N_{s1}$
-and $\alpha_2 = 2N_{s2}$. In addition, plot the fixation probability under
+*as a function of the initial frequency $x \in [0, 1]$ for $\alpha_1 = 2N{s_1}$
+and $\alpha_2 = 2N{s_2}$. In addition, plot the fixation probability under
 neutrality $P_x \{T_1 < T_0 \} = x$. Are the values for the fixation
 probability estimated from the simulations compatible with these plots?*
 
@@ -115,6 +115,10 @@ qplot(p, p)
 fixationProb(.2, a1)
 fixationProb(.2, a2)
 ```
+
+The analytical fixation probability for $s_1$ is 0.5609451, consistent with the
+simulation result of 0.555. The same can be said for $s_2$, where the
+simulation result 0.816 closely matches the analytical one 0.7983713.
 
 
 # Part II
@@ -146,21 +150,21 @@ v2 <- .0001
 u3 <- .00005
 v3 <- .00005
 
-p <- seq(0,1,.001)
+p <- seq(0,1,.01)
 ```
 
 ```{r}
 a1 <- 4*N*u1
 b1 <- 4*N*v1
-qplot(p, dbeta(p, a1, b1), ylim=c(0,4))
+qplot(p, dbeta(p, a1, b1), ylim=c(0,4), geom='line')
 
 a2 <- 4*N*u2
 b2 <- 4*N*v2
-qplot(p, dbeta(p, a2, b2), ylim=c(0,4))
+qplot(p, dbeta(p, a2, b2), ylim=c(0,4), geom='line')
 
 a3 <- 4*N*u3
 b3 <- 4*N*v3
-qplot(p, dbeta(p, a3, b3), ylim=c(0,4))
+qplot(p, dbeta(p, a3, b3), ylim=c(0,4), geom='line')
 ```
 
 
@@ -192,7 +196,7 @@ getNextGenMutation <- function(p, popsize, u, v) {
   return(rbinom(length(p), popsize, psi)/popsize)
 }
 
-makeWFMutation <- function(p, u, v, ngenerations, popsize, reps) {
+makeWFMutation <- function(u, v, ngenerations, popsize, reps) {
   pop <- matrix(0, nrow=reps, ncol=ngenerations)
   a <- 4*popsize*u
   b <- 4*popsize*v
@@ -209,9 +213,9 @@ makeWFMutation <- function(p, u, v, ngenerations, popsize, reps) {
 ngenerations <- 500
 reps <- 1000
 
-wf_m1 <- makeWFMutation(p, u1, v1, ngenerations, N, reps)
-wf_m2 <- makeWFMutation(p, u2, v2, ngenerations, N, reps)
-wf_m3 <- makeWFMutation(p, u3, v3, ngenerations, N, reps)
+wf_m1 <- makeWFMutation(u1, v1, ngenerations, N, reps)
+wf_m2 <- makeWFMutation(u2, v2, ngenerations, N, reps)
+wf_m3 <- makeWFMutation(u3, v3, ngenerations, N, reps)
 ```
 
 ```{r}
@@ -230,7 +234,8 @@ wf_m3 <- tbl_df(wf_m3)
 ```{r}
 wf_m1 %>% select(T1, T500) %>%
   gather(Generation, p) %>%
-  ggplot() + aes(x=p) + facet_grid(.~Generation) + geom_histogram(bins=50)
+  ggplot() + aes(x=p) + facet_grid(.~Generation) + geom_histogram(bins=50) +
+  stat_function(fun = function(x) 20*dbeta(x, a1, b1))
 
 wf_m1 %>% select(T1, T500) %>%
   ggplot() + aes(x=sort(T1), y=sort(T500)) + geom_point() +
@@ -238,7 +243,8 @@ wf_m1 %>% select(T1, T500) %>%
 
 wf_m2 %>% select(T1, T500) %>%
   gather(Generation, p) %>%
-  ggplot() + aes(x=p) + facet_grid(.~Generation) + geom_histogram(bins=50)
+  ggplot() + aes(x=p) + facet_grid(.~Generation) + geom_histogram(bins=50) +
+  stat_function(fun = function(x) 20*dbeta(x, a2, b2))
 
 wf_m2 %>% select(T1, T500) %>%
   ggplot() + aes(x=sort(T1), y=sort(T500)) + geom_point() +
@@ -246,7 +252,8 @@ wf_m2 %>% select(T1, T500) %>%
 
 wf_m3 %>% select(T1, T500) %>%
   gather(Generation, p) %>%
-  ggplot() + aes(x=p) + facet_grid(.~Generation) + geom_histogram(bins=50)
+  ggplot() + aes(x=p) + facet_grid(.~Generation) + geom_histogram(bins=50) +
+  stat_function(fun = function(x) 20*dbeta(x, a3, b3))
 
 wf_m3 %>% select(T1, T500) %>%
   ggplot() + aes(x=sort(T1), y=sort(T500)) + geom_point() +
