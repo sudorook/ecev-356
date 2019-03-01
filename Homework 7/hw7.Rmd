@@ -260,6 +260,13 @@ wf_m3 %>% select(T1, T500) %>%
   geom_abline(intercept=0, slope=1) + xlab("T1") + ylab("T500")
 ```
 
+The distributions of allele frequencies for all three simulations match the
+stationary distribution at times T1 and T500. This is to be expected,
+considering the definition of stationary distribution.
+
+There may be some skew towards extremes in the T500 samples, though. (See q-q
+plots for each simulation.)
+
 
 # Part III
 
