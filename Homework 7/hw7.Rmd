@@ -230,15 +230,27 @@ wf_m3 <- tbl_df(wf_m3)
 ```{r}
 wf_m1 %>% select(T1, T500) %>%
   gather(Generation, p) %>%
-  ggplot() + aes(x=p) + facet_grid(.~Generation, scales='free') + geom_histogram(bins=50)
+  ggplot() + aes(x=p) + facet_grid(.~Generation) + geom_histogram(bins=50)
+
+wf_m1 %>% select(T1, T500) %>%
+  ggplot() + aes(x=sort(T1), y=sort(T500)) + geom_point() +
+  geom_abline(intercept=0, slope=1) + xlab("T1") + ylab("T500")
 
 wf_m2 %>% select(T1, T500) %>%
   gather(Generation, p) %>%
-  ggplot() + aes(x=p) + facet_grid(.~Generation, scales='free') + geom_histogram(bins=50)
+  ggplot() + aes(x=p) + facet_grid(.~Generation) + geom_histogram(bins=50)
+
+wf_m2 %>% select(T1, T500) %>%
+  ggplot() + aes(x=sort(T1), y=sort(T500)) + geom_point() +
+  geom_abline(intercept=0, slope=1) + xlab("T1") + ylab("T500")
 
 wf_m3 %>% select(T1, T500) %>%
   gather(Generation, p) %>%
-  ggplot() + aes(x=p) + facet_grid(.~Generation, scales='free') + geom_histogram(bins=50)
+  ggplot() + aes(x=p) + facet_grid(.~Generation) + geom_histogram(bins=50)
+
+wf_m3 %>% select(T1, T500) %>%
+  ggplot() + aes(x=sort(T1), y=sort(T500)) + geom_point() +
+  geom_abline(intercept=0, slope=1) + xlab("T1") + ylab("T500")
 ```
 
 
