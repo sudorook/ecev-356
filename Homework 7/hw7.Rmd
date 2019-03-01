@@ -188,7 +188,7 @@ stationary distribution.*
 
 ```{r}
 getNextGenMutation <- function(p, popsize, u, v) {
-  psi <- p - p*popsize*u + (1-p)*popsize*v # adjust p by mutation rate
+  psi <- p - p*u + (1-p)*v # adjust p by mutation rate
   return(rbinom(length(p), popsize, psi)/popsize)
 }
 
