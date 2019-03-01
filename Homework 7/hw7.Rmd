@@ -12,28 +12,25 @@ library(tidyr)
 set.seed(10)
 ```
 
-
 # Part I
 
 ## 1
-
-Implement a program in R to simulate the discrete Wright-Fisher model under
+*Implement a program in R to simulate the discrete Wright-Fisher model under
 genic selection (without mutation). To this end, start with a given initial
 frequency $p_0$. Given that the population allele-frequency in generation $k$
-is $p_k$, the frequency in the next generation $k + 1$ is given by
+is $p_k$, the frequency in the next generation $k + 1$ is given by*
 
 \begin{align}
 p_{k+1} = \frac{X_{k+1}}{2N}
 \end{align}
 
-where $X_{k+1}$ is distributed according to a Binomial distribution with $2N$
+*where $X_{k+1}$ is distributed according to a Binomial distribution with $2N$
 trials and success probability $\Psi_k$ given by the selection-adjusted
 population allele frequency, as discussed in class. This dynamics is repeated
 for several generations, until the frequency is either equal to $0$ (the
 beneficial allele is lost) or equal to $1$ (the beneficial allele fixed). It is
 advisable to stop the simulation after a large number of generations (for
-example $20000$), even if the allele is not yet absorbed.
-
+example $20000$), even if the allele is not yet absorbed.*
 
 ```{r}
 getNextGenSelection <- function(p, popsize, s) {
@@ -54,11 +51,10 @@ makeWFSelection <- function(p, s, ngenerations, popsize, reps) {
 
 
 ## 2
-
-Using this implementation, simulate the Wright-Fisher model $1000$ times with
+*Using this implementation, simulate the Wright-Fisher model $1000$ times with
 $N = 2000$, initial frequency $0.2$, and selection coefficient $s_1 = 0.0005$
 and $s_2 = 0.001$, respectively. For each selection coefficient, what is the
-fraction of simulations where the beneficial allele gets fixed.
+fraction of simulations where the beneficial allele gets fixed.*
 
 ```{r}
 N <- 2000
@@ -82,17 +78,16 @@ mean(wfpop2[,ngenerations] == 1)
 
 
 ## 3
-
-Plot the fixation probability discussed in class
+*Plot the fixation probability discussed in class*
 
 \begin{align}
 \mathbb{P}_x \{T_1 < T_0\} = \frac{1-e^{-2\alpha x}}{1-e^{-2\alpha}}
 \end{align}
 
-as a function of the initial frequency $x \in [0, 1]$ for $\alpha_1 = 2N_{s1}$
+*as a function of the initial frequency $x \in [0, 1]$ for $\alpha_1 = 2N_{s1}$
 and $\alpha_2 = 2N_{s2}$. In addition, plot the fixation probability under
 neutrality $P_x \{T_1 < T_0 \} = x$. Are the values for the fixation
-probability estimated from the simulations compatible with these plots?
+probability estimated from the simulations compatible with these plots?*
 
 ```{r}
 fixationProb <- function(x, a) {
@@ -124,23 +119,23 @@ fixationProb(.2, a2)
 
 # Part II
 
-Consider the discrete Wright-Fisher model for a population of size $N$ ($2N$
+*Consider the discrete Wright-Fisher model for a population of size $N$ ($2N$
 haploids) with recurrent mutation (no selection), where $u$ is the per
 generation probability of $A \rightarrow a$ mutations and $v$ is the
-probability of $a \rightarrow A$ mutations
+probability of $a \rightarrow A$ mutations*
 
 ## 1
-We had seen in class, that the stationary distribution of the population-allele
+*We had seen in class, that the stationary distribution of the population-allele
 frequency $y$ of A alleles for the corresponding Wright-Fisher diffusion is given
-by the Beta distribution
+by the Beta distribution*
 
 \begin{align}
 \pi_{\beta_1,\beta_2}(y) = \frac{1}{B(\beta_1,\beta_2)} y^{\beta_2-1}(1-y)^{\beta_1-1}
 \end{align}
 
-with $\beta_1 = 4Nu$ and $\beta_2 = 4Nv$. Plot this distribution using the
+*with $\beta_1 = 4Nu$ and $\beta_2 = 4Nv$. Plot this distribution using the
 R-function `dbeta` with $N = 2500$ for $u = v = 0.0002$, $u = v = 0.0001$, and $u
-= v = 0.00005$. Set the limits of the y-axis as $[0,4]$.
+= v = 0.00005$. Set the limits of the y-axis as $[0,4]$.*
 
 ```{r}
 N <- 2500
@@ -170,16 +165,16 @@ qplot(p, dbeta(p, a3, b3), ylim=c(0,4))
 
 
 ## 2
-Implement a program in R to simulate the discrete Wright-Fisher model with
+*Implement a program in R to simulate the discrete Wright-Fisher model with
 recurrent mutation (no selection). Again, start with a given initial frequency
 $p_0$. Given that the population allele-frequency in generation $k$, the
-frequency in the next generation is given by
+frequency in the next generation is given by*
 
 \begin{align}
 p_{k+1} = \frac{X_{k+1}}{2N}
 \end{align}
 
-where $X_{k+1}$ is distributed according to a Binomial distribution with $2N$
+*where $X_{k+1}$ is distributed according to a Binomial distribution with $2N$
 trials and success probability $\Psi_k$ given by the mutation-adjusted
 population allele frequency, as discussed in class. For mutation probabilities
 $u = v = 0.0002$, $u = v = 0.0001$, and $u = v = 0.00005$ perform $1000$
@@ -189,7 +184,7 @@ mutation probabilities, plot a histogram of the initial frequencies, and a
 histogram of the frequencies after $500$ generations (use `breaks=50` for the
 histograms). Compare the histograms of the initial frequencies with the
 histogram of the frequencies after $500$ generations, and with the plot of the
-stationary distribution.
+stationary distribution.*
 
 ```{r}
 getNextGenMutation <- function(p, popsize, u, v) {
@@ -220,33 +215,17 @@ wf_m3 <- makeWFMutation(p, u3, v3, ngenerations, N, reps)
 ```
 
 ```{r}
-# tidy the data a bit... makes for sexy tables later... an unnecessary number
-# of cpu cycles died unnecessarily to give us this information...
-
 header <- paste('T', seq(1,ngenerations), sep='')
 
 colnames(wf_m1) <- header
 wf_m1 <- tbl_df(wf_m1)
-# wf_m1_m <- gather(tbl_df(wf_m1), Generation, p) %>% 
-#   mutate(AdjMutRate=as.character(4*N*u1))
 
 colnames(wf_m2) <- header
 wf_m2 <- tbl_df(wf_m2)
-# wf_m2_m <- gather(tbl_df(wf_m2), Generation, p) %>% 
-#   mutate(AdjMutRate=as.character(4*N*u2))
 
 colnames(wf_m3) <- header
 wf_m3 <- tbl_df(wf_m3)
-# wf_m3_m <- gather(tbl_df(wf_m3), Generation, p) %>% 
-#   mutate(AdjMutRate=as.character(4*N*u3))
-
-# df1_m <- gather(tbl_df(wf_m1), Generation, 'AdjMutRate=2')
-# df2_m <- gather(tbl_df(wf_m2), Generation, 'AdjMutRate=1')
-# df3_m <- gather(tbl_df(wf_m3), Generation, 'AdjMutRate=.5')
-# df_m <- bind_cols(df1_m, select(df2_m, 'AdjMutRate=1'), select(df3_m, 'AdjMutRate=.5')) %>%
-#   gather(AdjMutRate, p, -Generation)
 ```
-
 
 ```{r}
 wf_m1 %>% select(T1, T500) %>%
@@ -265,29 +244,29 @@ wf_m3 %>% select(T1, T500) %>%
 
 # Part III
 
-For a given population allele frequency $y$, the heterozygosity
+*For a given population allele frequency $y$, the heterozygosity*
 
 \begin{equation}
 h(y) := 2y(1-y)
 \end{equation}
 
-yields the probability that $2$ randomly paired gametes do not carry the same
-allele. With initial frequency $x$, how does the expected heterozygosity
+*yields the probability that $2$ randomly paired gametes do not carry the same
+allele. With initial frequency $x$, how does the expected heterozygosity*
 
 \begin{equation}
 \mathbb{E}_x [h(Y_t)]
 \end{equation}
 
-change over time under the neutral Wright-Fisher diffusion with just genetic
+*change over time under the neutral Wright-Fisher diffusion with just genetic
 drift (no mutation, no selection). Thus, we have $\mu(y) = 0$ and $\sigma_2 (y)
-= y(1 - y)$. To this end, consider the derivative with respect to time
+= y(1 - y)$. To this end, consider the derivative with respect to time*
 
 \begin{align}
 \frac{\partial}{\partial t} \mathbb{E}_x [h(Y_t)] &= \frac{\partial}{\partial t} \int_0^1 h(y)p(t;x,y)dy \\
   &= \int_0^1 h(y) \frac{\partial}{\partial t}\{p(t;x,y)\}dy
 \end{align}
 
-which follows directly from the definition of the expected value. Compute this
+*which follows directly from the definition of the expected value. Compute this
 derivative, by substituting the forward equation and using integration by
 parts. You can assume that the terms for $y = 0$ and $y = 1$ are $0$. What does
-this derivative imply for the change of the expected heterozygosity over time?
+this derivative imply for the change of the expected heterozygosity over time?*
