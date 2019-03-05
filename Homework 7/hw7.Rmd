@@ -300,8 +300,8 @@ this derivative imply for the change of the expected heterozygosity over time?*
 
 \begin{align}
 \frac{\partial}{\partial t} \mathbb{E}_x [h(Y_t)] &= \int_0^1 h(y) \frac{\partial}{\partial t}\{p(t;x,y)\}dy \\
-  &= \int_0^1 h(y) \Big( \frac{\partial}{\partial y} \{ \mu (y) p(t;x,y) \} + \frac{1}{2} \frac{\partial^2}{\partial y^2} \{ \sigma^2 (y) p(t;x,y) \} \Big)dy \\
-  &= \int_0^1 h(y) \Big( \frac{\partial}{\partial y} \{ 0 p(t;x,y) \} + \frac{1}{2} \frac{\partial^2}{\partial y^2} \{ \sigma^2 (y) p(t;x,y) \} \Big)dy \\
+  &= \int_0^1 h(y) \Big( -\frac{\partial}{\partial y} \{ \mu (y) p(t;x,y) \} + \frac{1}{2} \frac{\partial^2}{\partial y^2} \{ \sigma^2 (y) p(t;x,y) \} \Big)dy \\
+  &= \int_0^1 h(y) \Big( -\frac{\partial}{\partial y} \{ 0 p(t;x,y) \} + \frac{1}{2} \frac{\partial^2}{\partial y^2} \{ \sigma^2 (y) p(t;x,y) \} \Big)dy \\
   &= \int_0^1 h(y) \frac{1}{2} \frac{\partial^2}{\partial y^2} \{ \sigma^2 (y) p(t;x,y) \} dy \\
   &= \big[\frac{1}{2} h(t) \frac{\partial}{\partial y} \{ \sigma^2 (y) p(t;x,y) \} \big]^1_0 - \int_0^1 h^\prime (y) \frac{1}{2} \frac{\partial}{\partial y} \{ \sigma^2 (y) p(t;x,y) \} dy \\
   &= 0 - \int_0^1 h^\prime (y) \frac{1}{2} \frac{\partial}{\partial y} \{ \sigma^2 (y) p(t;x,y) \} dy \\
